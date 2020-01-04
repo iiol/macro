@@ -1,17 +1,17 @@
-# Strings
+# String examples
 
-Create new strings with fixed length
+Creating new string with fixed length
 ```c
 string str;
 
 str = str_new(5);
 ```
 
-Create new strings with dynamic length
+Creating new string with dynamic length
 ```c
 string str;
 
-str = str_new(5);
+str = str_new(0);
 ```
 or
 ```c
@@ -20,15 +20,17 @@ string str;
 str = str_set(NULL, "Hello World");
 ```
 
-Append to string
+Appending to string
 ```c
 string str;
 
 str = str_set(NULL, "Hello ");
 str = str_cat(str, "World");
+
+printf("%s\n", str); // "Hello World"
 ```
 
-Splitting strings
+Splitting string
 ```c
 int i;
 string path;
@@ -44,16 +46,16 @@ str_arr_free(arr);
 str_free(path);
 ```
 
-# Lists
+# Doubly linked list examples
 
-TODO
+**TODO**
 
 # Logging macros
 
 ```c
-debug(fmt, ...);
-warning(fmt, ...);
-error(exit_code, fmt, ...);
+debug(fmt, ...);            // print debug message
+warning(fmt, ...);          // print warning message
+error(exit_code, fmt, ...); // print error message and exit with exit_code
 perror(str);
 assert(exp);
 ```
@@ -68,10 +70,13 @@ xrealloc(void *ptr, size_t size);
 # Other macros
 
 ```c
-sqr(x);
-SWAP(a, b);
-SWAP_MW(a, b);
+sqr(x);                        // Square of x
+SWAP(a, b);                    // Swap 2 variables
+SWAP_MW(a, b);                 // Swap 2 machine word length varialbes
 MAX(a, b);
 MIN(a, b);
-SYSCALL(exit_code, func, ...);
+UNUSED(variable);
+SYSCALL(exit_code, func, ...); // Call syscall and exit on failure with exit_code.
+                               // 0 for exit_code is a special value mean
+                               // don't call exit()
 ```

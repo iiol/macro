@@ -1,6 +1,19 @@
 #!/bin/sh
 
-HDRS="$(echo src/includes.h; ls src/*.h | grep -v 'src/includes.h')"
-SRCS="$(ls src/*.c)"
+OUTPUT="macro.h"
 
-cat $HDRS $SRCS | grep -v "^#include \"" >macro.h
+>$OUTPUT
+
+(echo src/includes.h; ls src/*.h | grep -v 'src/includes.h') |
+while read filename; do
+	echo "// File: $filename" >>$OUTPUT
+	cat "$filename" | tail -n +3 | head -n -1 | grep -v '^#include "' |
+	    awk '!/^$/ || ISPRINT {print; ISPRINT=1}' >>$OUTPUT
+done
+
+ls src/*.c |
+while read filename; do
+	echo "// File: $filename" >>$OUTPUT
+	cat "$filename" | grep -v '^#include "' |
+	    awk '!/^$/ || ISPRINT {print; ISPRINT=1}' >>$OUTPUT
+done

@@ -1,7 +1,55 @@
 #include "macro.h"
 
-int
-main(void)
+struct foo {
+	int a;
+	float b;
+	char *str;
+};
+
+void
+list_test(void)
+{
+	struct foo *head, *entry = NULL;
+
+	entry = list_alloc_at_end(entry);
+	entry->a = 10;
+	entry->b = 10.01;
+	entry->str = "1";
+
+	entry = list_alloc_at_end(entry);
+	entry->a = 100;
+	entry->b = 100.001;
+	entry->str = "2";
+
+	entry = list_alloc_prev(entry);
+	entry->a = 50;
+	entry->b = 50.05;
+	entry->str = "Hello";
+
+	entry = list_alloc_at_start(entry);
+	entry->a = 1;
+	entry->b = 1.1;
+	entry->str = "4";
+
+	entry = list_alloc_at_start(entry);
+	entry->a = 0;
+	entry->b = 0.0;
+	entry->str = "5";
+
+	head = list_get_head(entry);
+	list_foreach(head, entry)
+		debug("%3d, %7.3f", entry->a, entry->b);
+
+	entry = list_search_by_str(head, str, "Hello");
+	debug("Find: '%s', %3d, %7.3f", entry->str, entry->a, entry->b);
+	entry = list_search_by_elem(head, b, 10.01f);
+	debug("Find: '%s', %3d, %7.3f", entry->str, entry->a, entry->b);
+
+	list_destroy(head);
+}
+
+void
+string_test(void)
 {
 	string str, str2;
 	int i;
@@ -40,6 +88,14 @@ main(void)
 	str_free(str);
 	str_free(str2);
 	str_arr_free(strs);
+}
+
+int
+main(void)
+{
+	list_test();
+	putchar('\n');
+	string_test();
 
 	return 0;
 }

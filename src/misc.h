@@ -7,6 +7,8 @@
 
 #define sqr(x) ((double)(x)*(x))
 
+#define UNUSED(x) (void)x
+
 #define SWAP(a, b) do {typeof (a) __tmp = a; a = b; b = __tmp;} while (0)
 #define SWAP_MW(a, b) do {a ^= b; b ^= a; a ^= b;} while(0)
 

@@ -25,7 +25,12 @@ do {									\
 
 #define debug(fmt, ...)   _int_logit(stderr, "[D] ", fmt, ##__VA_ARGS__)
 #define warning(fmt, ...) _int_logit(stderr, "[W] ", fmt, ##__VA_ARGS__)
-#define error(fmt, ...)   _int_logit(stderr, "[E] ", fmt, ##__VA_ARGS__)
+
+#define error(ecode, fmt, ...)						\
+do {									\
+	_int_logit(stderr, "[E] ", fmt, ##__VA_ARGS__);			\
+	exit(ecode);							\
+} while (0)
 
 #define perror(str)							\
 do {									\

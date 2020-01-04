@@ -55,8 +55,7 @@ str_setopt(string str, enum str_opts opt, int val)
 		break;
 
 	default:
-		error("Unknown option: 0x%x", opt);
-		exit(1);
+		error(1, "Unknown option: 0x%x", opt);
 	}
 }
 
@@ -102,11 +101,11 @@ str_cat(string str, const char *src)
 	assert(str);
 	assert(src);
 
-	s = alloca(strlen(src) + 1);
-	strcpy(s, src);
-
 	head = __str_get_header(str);
-	slen = strlen(s);
+	slen = strlen(src);
+
+	s = alloca(slen + 1);
+	strcpy(s, src);
 
 	if (slen + head->len > head->bufsize && head->isdynamic) {
 		size = sizeof (struct str_string) + slen + head->len + 2;

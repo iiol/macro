@@ -2,9 +2,11 @@
 #define _MACRO_LIST_H
 
 #include "includes.h"
+#include "misc.h"
 
 struct list_meta {
 	struct list_node *head, *tail;
+	size_t node_size;
 };
 
 struct list_node {
@@ -13,139 +15,45 @@ struct list_node {
 };
 
 
-#define xassert(var)							\
-({									\
-	typeof (var) __var = var;					\
-									\
-	if (!__var) {							\
-		_int_logit_full(stderr, "[A] ", "%s", #var);		\
-		exit(1);						\
-	}								\
-									\
-	__var;								\
-})
+#define list_new(type) __list_new(sizeof (type), NULL)
+#define list_alloc_next(entry) __list_alloc_next(entry, sizeof (typeof (*entry)))
+#define list_alloc_prev(entry) __list_alloc_prev(entry, sizeof (typeof (*entry)))
+#define list_alloc_at_end(entry) __list_alloc_at_end(entry, sizeof (typeof (*entry)))
+#define list_alloc_at_start(entry) __list_alloc_at_start(entry, sizeof (typeof (*entry)))
+#define list_foreach(start, entry) for (entry = start; entry != NULL; entry = list_get_next(entry))
 
-#define list_init(p)							\
+#define list_search_by_elem(entry, elem, value)				\
 ({									\
-	typeof (p) __p;							\
+	typeof (entry) __p;						\
 									\
-	__p = xmalloc(sizeof (typeof (*__p)));				\
-	memset(&__p->_list, 0, sizeof (struct list_node));		\
-									\
-	__p->_list.meta = xmalloc(sizeof (struct list_meta));		\
-	__p->_list.meta->head = &__p->_list;				\
-	__p->_list.meta->tail = &__p->_list;				\
-	__p->_list.prev = NULL;						\
-	__p->_list.next = NULL;						\
-									\
-	if (strcmp("NULL", #p) != 0)					\
-		p = __p;						\
-									\
-	__p								\
-})
-
-#define list_alloc_at_end(p)						\
-({									\
-	typeof (p) __newp, __p = p;					\
-									\
-	if (__p) {							\
-		__newp = xmalloc(sizeof (typeof (*__p)));		\
-		__newp->_list.meta = __p->_list.meta;			\
-		__newp->_list.prev = __p->_list.meta->tail;		\
-		__newp->_list.next = NULL;				\
-		__newp->_list.meta->tail = &(__newp->_list);		\
-		if (__newp->_list.prev != NULL)				\
-			__newp->_list.prev->next = &(__newp->_list);	\
-	}								\
-	else								\
- 		list_init(__newp);					\
-									\
-	__newp;								\
-})
-
-#define list_delete(p)							\
-({									\
-	typeof (p) __head = NULL, __p = xassert(p);			\
-	unsigned int __offst = offsetof(typeof (*__p), _list);		\
-									\
-	if (__p->_list.prev == NULL)					\
-		__p->_list.meta->head = __p->_list.next;		\
-	else								\
-		__p->_list.prev->next = __p->_list.next;		\
-									\
-	if (__p->_list.next == NULL)					\
-		__p->_list.meta->tail = __p->_list.prev;		\
-	else								\
-		__p->_list.next->prev = __p->_list.prev;		\
-									\
-	if (__p->_list.meta->head != NULL)				\
-		__head = (void*)((int8_t*)__p->_list.meta->head - __offst); \
-									\
-	if (__p->_list.prev == NULL && __p->_list.next == NULL)		\
-		free(__p->_list.meta);					\
-									\
-	free(__p);							\
-									\
-	__head;								\
-})
-
-#define list_get_prev(p)						\
-({									\
-	typeof (p) __ret = NULL, __p = xassert(p);			\
-	unsigned int __offst = offsetof(typeof (*__p), _list);		\
-									\
-	if (__p->_list.prev != NULL)					\
-		__ret = (void*)((int8_t*)__p->_list.prev - __offst);	\
-									\
-	__ret;								\
-})
-
-#define list_get_next(p)						\
-({									\
-	typeof (p) __ret = NULL, __p = xassert(p);			\
-	unsigned int __offst = offsetof(typeof (*__p), _list);		\
-									\
-	if (__p->_list.next != NULL)					\
-		__ret = (void*)((int8_t*)__p->_list.next - __offst);	\
-									\
-	__ret;								\
-})
-
-#define list_get_head(p)						\
-({									\
-	typeof (p) __ret = NULL, __p = xassert(p);			\
-	unsigned int __offst = offsetof(typeof (*__p), _list);		\
-									\
-	if (__p->_list.meta->head != NULL)				\
-		__ret = (void*)((int8_t*)__p->_list.meta->head - __offst); \
-									\
-	__ret;								\
-})
-
-#define list_get_tail(p)						\
-({									\
-	typeof (p) __ret = NULL, __p = xassert(p);			\
-	unsigned int __offst = offsetof(typeof (*__p), _list);		\
-									\
-	if (__p->_list.meta->tail != NULL)				\
-		__ret = (void*)((int8_t*)__p->_list.meta->tail - __offst); \
-									\
-	__ret;								\
-})
-
-#define list_find(p, var, val)						\
-({									\
-	typeof (p) __entry;						\
-									\
-	list_foreach (p, __entry)					\
-		if (__entry->var == (val))				\
+	for (__p = entry; __p != NULL; __p = list_get_next(__p))	\
+		if (__p->elem == (value))				\
 			break;						\
 									\
-	__entry;							\
+	__p;								\
 })
 
-#define list_foreach(head, entry) for (entry = head; entry != NULL; entry = list_get_next(entry))
+#define list_search_by_str(entry, elem, str)				\
+({									\
+	typeof (entry) __p;						\
+									\
+	for (__p = entry; __p != NULL; __p = list_get_next(__p))	\
+		if (!strcmp(__p->elem, str))				\
+			break;						\
+									\
+	__p;								\
+})
 
-#undef xassert
+inline static void* __list_new(size_t size, struct list_meta *meta);
+inline static void* list_get_head(void *entry);
+inline static void* list_get_tail(void *entry);
+inline static void* list_get_prev(void *entry);
+inline static void* list_get_next(void *entry);
+inline static void* __list_alloc_next(void *entry, size_t size);
+inline static void* __list_alloc_prev(void *entry, size_t size);
+inline static void* __list_alloc_at_end(void *entry, size_t size);
+inline static void* __list_alloc_at_start(void *entry, size_t size);
+inline static void list_free(void *entry);
+inline static void list_destroy(void *entry);
 
 #endif // _MACRO_LIST_H
