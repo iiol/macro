@@ -1,0 +1,8 @@
+test
+macro.h
+
+# vim stuff
+.ycm_extra_conf.py
+*.swp
+*.swo
+tags
