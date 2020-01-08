@@ -177,7 +177,7 @@ __list_alloc_at_start(void *entry, size_t size)
 	return __list_alloc_prev(entry, size);
 }
 
-inline static void
+inline static void*
 list_free(void *entry)
 {
 	uint8_t *p;
@@ -185,7 +185,7 @@ list_free(void *entry)
 	struct list_meta *meta;
 
 	if (entry == NULL)
-		return;
+		return NULL;
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -201,10 +201,17 @@ list_free(void *entry)
 	else
 		hdr->next->prev = hdr->prev;
 
+	p = NULL;
+
+	if (hdr->meta->head != NULL)
+		p = (uint8_t*)hdr->meta->head + sizeof (struct list_node);
+
 	if (hdr->prev == NULL && hdr->next == NULL)
 		free(meta);
 
 	free(hdr);
+
+	return p;
 }
 
 inline static void

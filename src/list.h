@@ -15,7 +15,7 @@ struct list_node {
 };
 
 
-#define list_new(type) __list_new(sizeof (type), NULL)
+#define list_new(type) __list_new(sizeof (*type), NULL)
 #define list_alloc_next(entry) __list_alloc_next(entry, sizeof (typeof (*entry)))
 #define list_alloc_prev(entry) __list_alloc_prev(entry, sizeof (typeof (*entry)))
 #define list_alloc_at_end(entry) __list_alloc_at_end(entry, sizeof (typeof (*entry)))
@@ -53,7 +53,7 @@ inline static void* __list_alloc_next(void *entry, size_t size);
 inline static void* __list_alloc_prev(void *entry, size_t size);
 inline static void* __list_alloc_at_end(void *entry, size_t size);
 inline static void* __list_alloc_at_start(void *entry, size_t size);
-inline static void list_free(void *entry);
-inline static void list_destroy(void *entry);
+inline static void* list_free(void *entry);
+inline static void  list_destroy(void *entry);
 
 #endif // _MACRO_LIST_H
