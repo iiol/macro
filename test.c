@@ -40,6 +40,7 @@ list_test(void)
 	list_foreach(head, entry)
 		debug("%3d, %7.3f", entry->a, entry->b);
 
+	debug("Count: %d", list_get_count(head));
 	entry = list_search_by_str(head, str, "Hello");
 	debug("Find: '%s', %3d, %7.3f", entry->str, entry->a, entry->b);
 	entry = list_search_by_elem(head, b, 10.01f);

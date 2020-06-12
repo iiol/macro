@@ -6,7 +6,7 @@
 
 struct list_meta {
 	struct list_node *head, *tail;
-	size_t node_size;
+	int count;
 };
 
 struct list_node {

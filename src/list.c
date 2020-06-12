@@ -10,14 +10,15 @@ __list_new(size_t size, struct list_meta *meta)
 	p = (uint8_t*)hdr + sizeof (struct list_node);
 
 	if (meta == NULL) {
-		hdr->meta = malloc(sizeof (struct list_meta));
-		hdr->meta->head = hdr;
-		hdr->meta->tail = hdr;
-		hdr->meta->node_size = size;
+		meta = malloc(sizeof (struct list_meta));
+		meta->head = hdr;
+		meta->tail = hdr;
+		meta->count = 1;
 	}
 	else
-		hdr->meta = meta;
+		++meta->count;
 
+	hdr->meta = meta;
 	hdr->prev = NULL;
 	hdr->next = NULL;
 
@@ -54,6 +55,20 @@ list_get_tail(void *entry)
 	meta = hdr->meta;
 
 	return (uint8_t*)meta->tail + sizeof (struct list_node);
+}
+
+inline static int
+list_get_count(void *entry)
+{
+	uint8_t *p;
+	struct list_node *hdr;
+
+	assert(entry && "Argument is NULL");
+
+	p = entry;
+	hdr = (struct list_node*)(p - sizeof (struct list_node));
+
+	return hdr->meta->count;
 }
 
 inline static void*
@@ -202,6 +217,7 @@ list_free(void *entry)
 		hdr->next->prev = hdr->prev;
 
 	p = NULL;
+	--meta->count;
 
 	if (hdr->meta->head != NULL)
 		p = (uint8_t*)hdr->meta->head + sizeof (struct list_node);
