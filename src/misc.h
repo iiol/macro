@@ -4,21 +4,19 @@
 #include "includes.h"
 
 #define typeof(a) __typeof__(a)
+#define ARR_SZ(a) (sizeof (a)/sizeof (a[0]))
+#define UNUSED(x) (void)x
+#define SWAP(a, b) do {typeof (a) __tmp = a; a = b; b = __tmp;} while (0)
 
 #define sqr(x) ((double)(x)*(x))
-
-#define UNUSED(x) (void)x
-
-#define SWAP(a, b) do {typeof (a) __tmp = a; a = b; b = __tmp;} while (0)
-#define SWAP_MW(a, b) do {a ^= b; b ^= a; a ^= b;} while (0)
-
 #define MAX(a, b) ((a > b) ? a : b)
 #define MIN(a, b) ((a > b) ? b : a)
 
 #define SYSCALL(rc, ecode, func, ...)					\
 do {									\
 	int _;								\
-	(void)_;							\
+									\
+	UNUSED(_);							\
 									\
 	while ((_ = ((func)(__VA_ARGS__))) < 0 && errno == EINTR)	\
 		;							\
