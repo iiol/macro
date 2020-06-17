@@ -1,5 +1,15 @@
 #include "list.h"
 
+#define __list_extern_destroy(entry)			\
+do {							\
+	if (list_extern_funcs.destroy_node)		\
+		list_extern_funcs.destroy_node(entry);	\
+} while (0)
+
+static struct external_funcs {
+	void (*destroy_node)(void *entry);
+} list_extern_funcs;
+
 inline static void*
 __list_new(size_t size, struct list_meta *meta)
 {
@@ -32,7 +42,8 @@ list_get_head(void *entry)
 	struct list_node *hdr;
 	struct list_meta *meta;
 
-	assert(entry && "Argument is NULL");
+	if (!entry)
+		return NULL;
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -48,7 +59,8 @@ list_get_tail(void *entry)
 	struct list_node *hdr;
 	struct list_meta *meta;
 
-	assert(entry && "Argument is NULL");
+	if (!entry)
+		return NULL;
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -63,7 +75,8 @@ list_get_count(void *entry)
 	uint8_t *p;
 	struct list_node *hdr;
 
-	assert(entry && "Argument is NULL");
+	if (!entry)
+		return 0;
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -77,7 +90,8 @@ list_get_prev(void *entry)
 	uint8_t *p;
 	struct list_node *hdr;
 
-	assert(entry && "Argument is NULL");
+	if (!entry)
+		return NULL;
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -97,7 +111,8 @@ list_get_next(void *entry)
 	uint8_t *p;
 	struct list_node *hdr;
 
-	assert(entry && "Argument is NULL");
+	if (!entry)
+		return NULL;
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -112,7 +127,7 @@ list_get_next(void *entry)
 }
 
 inline static void*
-__list_alloc_next(void *entry, size_t size)
+__list_alloc_after(void *entry, size_t size)
 {
 	uint8_t *new_p, *p;
 	struct list_node *new_hdr, *hdr;
@@ -141,7 +156,7 @@ __list_alloc_next(void *entry, size_t size)
 }
 
 inline static void*
-__list_alloc_prev(void *entry, size_t size)
+__list_alloc_before(void *entry, size_t size)
 {
 	uint8_t *new_p, *p;
 	struct list_node *new_hdr, *hdr;
@@ -177,7 +192,7 @@ __list_alloc_at_end(void *entry, size_t size)
 
 	entry = list_get_tail(entry);
 
-	return __list_alloc_next(entry, size);
+	return __list_alloc_after(entry, size);
 
 }
 
@@ -189,9 +204,14 @@ __list_alloc_at_start(void *entry, size_t size)
 
 	entry = list_get_head(entry);
 
-	return __list_alloc_prev(entry, size);
+	return __list_alloc_before(entry, size);
 }
 
+/*
+ * @desc		list_free -- free list entry
+ * @arg[in]		entry     -- pointer to entry
+ * @ret			pointer to head of list or NULL if deleted last entry
+ */
 inline static void*
 list_free(void *entry)
 {
@@ -230,8 +250,36 @@ list_free(void *entry)
 	return p;
 }
 
+/*
+ * @desc		list_free_range -- free count entries from <fromth> element from head
+ * @arg[in]		entry           -- pointer to any entry in list
+ * @ret			pointer to head of list or NULL if deleted last entry
+ */
+inline static void*
+list_free_range(void *entry, int from, int count)
+{
+	int i;
+	void *next, *ret;
+
+	for (i = 0; entry != NULL; ++i, entry = next) {
+		if (i < from || i >= from + count)
+			continue;
+
+		next = list_get_next(entry);
+		ret = list_free(entry);
+	}
+
+	return ret;
+}
+
+/*
+ * @desc		list_free_full -- free full list
+ * @arg[in]		entry          -- pointer to any entry in list
+ * @ret			void
+ * TODO: rewrite
+ */
 inline static void
-list_destroy(void *entry)
+list_free_full(void *entry)
 {
 	uint8_t *p;
 	struct list_node *hdr;
@@ -249,4 +297,49 @@ list_destroy(void *entry)
 		hdr = hdr->next;
 		list_free(p);
 	}
+}
+
+inline static void*
+list_destroy(void *entry)
+{
+	__list_extern_destroy(entry);
+
+	return list_free(entry);
+}
+
+inline static void*
+list_destroy_range(void *entry, int from, int count)
+{
+	int i;
+	void *next, *ret;
+
+	for (i = 0; entry != NULL; ++i, entry = next) {
+		if (i < from || i >= from + count)
+			continue;
+
+		next = list_get_next(entry);
+		__list_extern_destroy(entry);
+		ret = list_free(entry);
+	}
+
+	return ret;
+}
+
+inline static void
+list_destroy_full(void *entry)
+{
+	int i;
+	void *next;
+
+	for (i = 0; entry != NULL; ++i, entry = next) {
+		next = list_get_next(entry);
+		__list_extern_destroy(entry);
+		list_free(entry);
+	}
+}
+
+inline static void
+list_setfunc_destroy(void (*destroy_node)(void *entry))
+{
+	list_extern_funcs.destroy_node = destroy_node;
 }
