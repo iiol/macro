@@ -331,7 +331,7 @@ list_destroy_full(void *entry)
 	int i;
 	void *next;
 
-	for (i = 0; entry != NULL; ++i, entry = next) {
+	for (i = 0, entry = list_get_head(entry); entry != NULL; ++i, entry = next) {
 		next = list_get_next(entry);
 		__list_extern_destroy(entry);
 		list_free(entry);

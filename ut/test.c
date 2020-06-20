@@ -7,6 +7,19 @@
 #include "test.h"
 #include "macro.h"
 
+#ifdef UT_TEST_CONSOLE
+#  define CU_run_tests() CU_console_run_tests()
+#else
+#  define CU_run_tests()				\
+do {							\
+	CU_basic_set_mode(CU_BRM_VERBOSE);		\
+	CU_basic_run_tests();				\
+	printf("\n");					\
+	CU_basic_show_failures(CU_get_failure_list());	\
+	printf("\n\n");					\
+} while (0)
+#endif
+
 int
 main(void)
 {
@@ -23,15 +36,7 @@ main(void)
 			goto finalize;
 	}
 
-#ifdef UT_TEST_BASIC
-	CU_basic_set_mode(CU_BRM_VERBOSE);
-	CU_basic_run_tests();
-	printf("\n");
-	CU_basic_show_failures(CU_get_failure_list());
-	printf("\n\n");
-#else
-	CU_console_run_tests();
-#endif
+	CU_run_tests();
 
 finalize:
 	CU_cleanup_registry();

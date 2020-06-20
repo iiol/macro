@@ -1,6 +1,6 @@
 SRC = $(wildcard list/*.c)
 
-CFLAGS = -Wall -DUT_TEST_BASIC -I../ -I./
+CFLAGS = -Wall -I../ -I./
 CFLAGS += `pkg-config --libs cunit`
 
 test: test.c ${SRC}
