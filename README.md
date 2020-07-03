@@ -46,11 +46,46 @@ str_arr_free(arr);
 str_free(path);
 ```
 
-# Doubly linked list examples
+# List examples
 
-**TODO**
+```c
+list_new(type);			// return pointer to new alloced list
 
-# Logging macros
+list_alloc_after(entry);	// return pointer to new alloced entry in list after 'entry'
+list_alloc_before(entry);	// return pointer to new alloced entry in list before 'entry'
+list_alloc_at_end(entry);	// return pointer to new alloced entry at tail of list
+list_alloc_at_start(entry);	// return pointer to new alloced entry at head of list
+
+list_get_head(entry);		// return head of list
+list_get_tail(entry);		// return tail of list
+list_get_prev(entry);		// return previous element in list
+list_get_next(entry);		// return next element in list
+
+list_foreach(start, entry);	// make cycle for each elements in list from 'start' to tail
+list_rofeach(start, entry);	// make reverse cycle for each element in list from 'start' to head
+list_foreachi(start, entry, i);	// like 'list_foreach', but with iterator 'i'
+list_rofeachi(start, entry, i);	// like 'list_rofeach', but with iterator 'i'
+
+list_search_by_elem(entry, elem, value); // return pointer to entry,
+					 // where element 'elem' equal 'value'
+list_search_by_str(entry, elem, str);	 // return pointer to entry,
+					 // where string element 'elem' equal 'str'
+
+list_free(entry);			// free entry 'entry' from list
+					// and return pointer to new head
+list_free_range(entry, from, count);	// free 'count' entries in list from 'from' element (counted from head)
+					// and return pointer to new head
+list_free_full(entry)			// free full list
+
+list_setfunc_destroy(func);	// set destroy function
+list_destroy(entry);		// like 'list_free', but call destroy function before
+list_destroy_range(entry);	// like 'list_free_range', but call destroy function before
+list_destroy_full(entry);	// like 'list_free_full', but call destroy function before
+```
+
+# Macros
+
+## Logging macros
 
 ```c
 debug(fmt, ...);            // print debug message
@@ -60,23 +95,23 @@ perror(str);
 assert(exp);
 ```
 
-# Other functions
-
-```c
-xmalloc(size_t size);
-xrealloc(void *ptr, size_t size);
-```
-
-# Other macros
+## Misc macros
 
 ```c
 sqr(x);                        // Square of x
 SWAP(a, b);                    // Swap 2 variables
-SWAP_MW(a, b);                 // Swap 2 machine word length varialbes
 MAX(a, b);
 MIN(a, b);
+ARR_SZ(arr);                   // return count of elements in array 'arr'
 UNUSED(variable);
 SYSCALL(exit_code, func, ...); // Call syscall and exit on failure with exit_code.
                                // 0 for exit_code is a special value mean
                                // don't call exit()
+```
+
+# Malloc functions
+
+```c
+xmalloc(size_t size);
+xrealloc(void *ptr, size_t size);
 ```
