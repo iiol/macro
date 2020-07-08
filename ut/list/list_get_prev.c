@@ -3,7 +3,6 @@
 
 #include <CUnit/CUnit.h>
 
-#include "test.h"
 #include "macro.h"
 
 struct test_list {

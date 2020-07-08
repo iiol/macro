@@ -34,10 +34,7 @@ do {									\
 
 #define perror(str)							\
 do {									\
-	char buf[64];							\
-									\
-	strerror_r(errno, buf, 64);					\
-	_int_logit(stderr, "[E] ", "%s: %s", str, buf);			\
+	_int_logit(stderr, "[E] ", "%s: %s", str, strerror(errno));	\
 } while (0)
 
 #undef assert

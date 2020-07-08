@@ -75,7 +75,7 @@ list_free(entry);			// free entry 'entry' from list
 					// and return pointer to new head
 list_free_range(entry, from, count);	// free 'count' entries in list from 'from' element (counted from head)
 					// and return pointer to new head
-list_free_full(entry)			// free full list
+list_free_full(entry);			// free full list
 
 list_setfunc_destroy(func);	// set destroy function
 list_destroy(entry);		// like 'list_free', but call destroy function before

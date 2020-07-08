@@ -32,6 +32,7 @@ do {									\
 } while (0)
 
 inline static void* xmalloc(size_t size);
+inline static void* xzmalloc(size_t size);
 inline static void* xrealloc(void *ptr, size_t size);
 
 #endif // _MACRO_MISC_H

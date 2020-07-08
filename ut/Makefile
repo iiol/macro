@@ -1,9 +1,9 @@
-SRC = $(wildcard list/*.c)
+SRC = $(wildcard list/*.c) test.c
 
-CFLAGS = -Wall -I../ -I./
+CFLAGS = -Wall -std=c99 -I../ -I./
 CFLAGS += `pkg-config --libs cunit`
 
-test: test.c ${SRC}
+test: ${SRC}
 	${CC} ${CFLAGS} -o $@ $^
 
 .PHONY: clean

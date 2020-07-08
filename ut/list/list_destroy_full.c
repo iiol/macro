@@ -3,7 +3,6 @@
 
 #include <CUnit/CUnit.h>
 
-#include "test.h"
 #include "macro.h"
 
 #define ENTRY_COUNT 5

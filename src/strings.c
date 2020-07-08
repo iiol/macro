@@ -1,3 +1,5 @@
+#include <alloca.h>
+
 #include "strings.h"
 
 inline static string
