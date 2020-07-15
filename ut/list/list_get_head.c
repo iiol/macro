@@ -32,7 +32,7 @@ valid_cases(void)
 static void
 invalid_cases(void)
 {
-	CU_ASSERT(list_get_tail(NULL) == NULL);
+	CU_ASSERT(list_get_head(NULL) == NULL);
 }
 
 bool

@@ -2,13 +2,46 @@
 
 #define __list_extern_destroy(entry)			\
 do {							\
-	if (list_extern_funcs.destroy_node)		\
+	struct list_meta *meta;				\
+							\
+	meta = __list_get_meta(entry);			\
+							\
+	if (meta && meta->efuncs.destroy_node)		\
+		meta->efuncs.destroy_node(entry);	\
+	else if (list_extern_funcs.destroy_node)	\
 		list_extern_funcs.destroy_node(entry);	\
 } while (0)
 
-static struct external_funcs {
-	void (*destroy_node)(void *entry);
-} list_extern_funcs;
+#define __list_extern_cmp_nodes(a, b)					\
+do {									\
+	if (__list_get_meta(a).size == __list_get_meta(b).size) {	\
+		struct list_meta *meta;					\
+									\
+		meta = __list_get_meta(a);				\
+									\
+		if (meta && meta->efuncs.cmp_nodes)			\
+			meta->efuncs.cmp_nodes(a, b);			\
+		else if (list_extern_funcs.cmp_nodes)			\
+			list_extern_funcs.cmp_nodes(a, b);		\
+	}								\
+} while (0)
+
+#define __list_extern_copy_node(to, from)		\
+do {							\
+	struct list_meta *meta;				\
+							\
+	meta = __list_get_meta(from);			\
+							\
+	if (meta && meta->efuncs.copy_node)		\
+		meta->efuncs.copy_node(to, from);	\
+	else if (list_extern_funcs.copy_node)		\
+		list_extern_funcs.copy_node(to, from);	\
+} while (0)
+
+#define __list_get_node(entry) ((struct list_node*)(entry ? (uint8_t*)entry - sizeof (struct list_node) : NULL))
+#define __list_get_meta(entry) ((struct list_meta*)(entry ? __list_get_node(entry)->meta : NULL))
+
+static struct external_funcs list_extern_funcs;
 
 inline static void*
 __list_new(size_t size, struct list_meta *meta)
@@ -24,6 +57,7 @@ __list_new(size_t size, struct list_meta *meta)
 		meta->head = hdr;
 		meta->tail = hdr;
 		meta->count = 1;
+		meta->ent_size = size;
 	}
 	else
 		++meta->count;
@@ -338,8 +372,126 @@ list_destroy_full(void *entry)
 	}
 }
 
+inline static void*
+list_dup(void *list)
+{
+	struct list_meta *meta, *nmeta;
+	struct list_node *nlist = NULL;
+	size_t size;
+	void *entry;
+
+	if (!list)
+		return NULL;
+
+	meta = __list_get_meta(list);
+	size = meta->ent_size;
+
+	list_foreach(list_get_head(list), entry) {
+		nlist = list_alloc_at_end(nlist);
+		memcpy(nlist, entry, size);
+	}
+
+	if (!nlist)
+		return NULL;
+
+	nmeta = __list_get_meta(nlist);
+	nmeta->ent_size = meta->ent_size;
+
+	return list_get_head(nlist);
+}
+
+inline static void*
+list_clone(void *list)
+{
+	struct list_meta *meta, *nmeta;
+	struct list_node *nlist = NULL;
+	void *entry;
+
+	if (!list)
+		return NULL;
+
+	meta = __list_get_meta(list);
+
+	list_foreach(list_get_head(list), entry) {
+		nlist = list_alloc_at_end(nlist);
+		__list_extern_copy_node(nlist, entry);
+	}
+
+	if (!nlist)
+		return NULL;
+
+	nmeta = __list_get_meta(nlist);
+	nmeta->ent_size = meta->ent_size;
+
+	return list_get_head(nlist);
+}
+
+inline static void*
+list_reverse(void *list)
+{
+	void *entry;
+	struct list_meta *meta;
+
+	if (list == NULL)
+		return NULL;
+
+	meta = __list_get_meta(list);
+	SWAP(meta->head, meta->tail);
+
+	list_foreach (list_get_head(list), entry) {
+		struct list_node *node;
+
+		node = __list_get_node(entry);
+		SWAP(node->next, node->prev);
+	}
+
+	return list_get_head(list);
+}
+
 inline static void
 list_setfunc_destroy(void (*destroy_node)(void *entry))
 {
 	list_extern_funcs.destroy_node = destroy_node;
+}
+
+inline static void
+list_setlfunc_destroy(void *entry, void (*destroy_node)(void *entry))
+{
+	struct list_meta *meta;
+
+	meta = __list_get_meta(entry);
+	if (meta)
+		meta->efuncs.destroy_node = destroy_node;
+}
+
+inline static void
+list_setfunc_cmp(int (*cmp_nodes)(void *a, void *b))
+{
+	list_extern_funcs.cmp_nodes = cmp_nodes;
+}
+
+inline static void
+list_setlfunc_cmp(void *entry, int (*cmp_nodes)(void *a, void *b))
+{
+	struct list_meta *meta;
+
+	meta = __list_get_meta(entry);
+	if (meta)
+		meta->efuncs.cmp_nodes = cmp_nodes;
+}
+
+inline static void
+list_setfunc_copy(void (*copy_node)(void *to, void *from))
+{
+	list_extern_funcs.copy_node = copy_node;
+}
+
+inline static void
+list_setlfunc_copy(void *entry, void (*copy_node)(void *to, void *from))
+{
+	struct list_meta *meta;
+
+	meta = __list_get_meta(entry);
+	if (meta)
+		meta->efuncs.copy_node = copy_node;
 }

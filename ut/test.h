@@ -19,7 +19,13 @@ bool list_get_head_suite(CU_pSuite suite);
 bool list_get_tail_suite(CU_pSuite suite);
 bool list_get_prev_suite(CU_pSuite suite);
 bool list_get_next_suite(CU_pSuite suite);
+
 bool list_destroy_full_suite(CU_pSuite suite);
+
+bool list_dup_suite(CU_pSuite suite);
+bool list_clone_suite(CU_pSuite suite);
+
+bool list_reverse_suite(CU_pSuite suite);
 
 static struct suite suits[] = {
 	{
@@ -41,6 +47,18 @@ static struct suite suits[] = {
 	{
 		.suitename = "list_destroy_full",
 		.func = list_destroy_full_suite,
+	},
+	{
+		.suitename = "list_dup",
+		.func = list_dup_suite,
+	},
+	{
+		.suitename = "list_clone",
+		.func = list_clone_suite,
+	},
+	{
+		.suitename = "list_reverse",
+		.func = list_reverse_suite,
 	},
 };
 

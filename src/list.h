@@ -1,17 +1,28 @@
 #ifndef _MACRO_LIST_H
 #define _MACRO_LIST_H
 
+#include <stdbool.h>
+
 #include "includes.h"
 #include "misc.h"
+
+struct external_funcs {
+	void (*destroy_node)(void *entry);
+	int (*cmp_nodes)(void *a, void *b);
+	void (*copy_node)(void *to, void *from);
+};
 
 struct list_meta {
 	struct list_node *head, *tail;
 	int count;
+	size_t ent_size;
+	struct external_funcs efuncs;
 };
 
 struct list_node {
 	struct list_meta *meta;
 	struct list_node *prev, *next;
+	uint8_t entry[0];
 };
 
 #define list_new(type) __list_new(sizeof (*type), NULL)
@@ -64,10 +75,19 @@ inline static void* list_free(void *entry);
 inline static void* list_free_range(void *entry, int from, int count);
 inline static void  list_free_full(void *entry);
 
+inline static void* list_dup(void *list);
+inline static void* list_clone(void *list);
+
 inline static void* list_destroy(void *entry);
 inline static void* list_destroy_range(void *entry, int from, int count);
 inline static void  list_destroy_full(void *entry);
 
 inline static void  list_setfunc_destroy(void (*destroy_node)(void *entry));
+inline static void  list_setfunc_cmp(int (*cmp_nodes)(void *a, void *b));
+inline static void  list_setfunc_copy(void (*copy_node)(void *to, void *from));
+
+inline static void  list_setlfunc_destroy(void *entry, void (*destroy_node)(void *entry));
+inline static void  list_setlfunc_cmp(void *entry, int (*cmp_nodes)(void *a, void *b));
+inline static void  list_setlfunc_copy(void *entry, void (*copy_node)(void *to, void *from));
 
 #endif // _MACRO_LIST_H
