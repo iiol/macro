@@ -71,16 +71,28 @@ list_search_by_elem(entry, elem, value); // return pointer to entry,
 list_search_by_str(entry, elem, str);	 // return pointer to entry,
 					 // where string element 'elem' equal 'str'
 
+list_dup(list);				// duplicate list (without calling user's copy function)
+list_clone(list);			// clone list (with calling user's copy function)
+
+list_reverse(list);			// reverse 'list' list
+
 list_free(entry);			// free entry 'entry' from list
 					// and return pointer to new head
 list_free_range(entry, from, count);	// free 'count' entries in list from 'from' element (counted from head)
 					// and return pointer to new head
 list_free_full(entry);			// free full list
 
-list_setfunc_destroy(func);	// set destroy function
 list_destroy(entry);		// like 'list_free', but call destroy function before
 list_destroy_range(entry);	// like 'list_free_range', but call destroy function before
 list_destroy_full(entry);	// like 'list_free_full', but call destroy function before
+
+list_setfunc_destroy(void (*func)(void *entry));		// set destroy function
+list_setfunc_cmp(int (*func)(void *a, void *b));		// set compare function
+list_setfunc_copy(void (*copy_node)(void *to, void *from));	// set copy function
+
+list_setlfunc_destroy(void *entry, void (*func)(void *entry));			// local version of list_setfunc_destroy
+list_setlfunc_cmp(void *entry, int (*func)(void *a, void *b));			// local version of list_setfunc_cmp
+list_setlfunc_copy(void *entry, void (*copy_node)(void *to, void *from));	// local version of list_setfunc_copy
 ```
 
 # Macros
@@ -113,5 +125,6 @@ SYSCALL(exit_code, func, ...); // Call syscall and exit on failure with exit_cod
 
 ```c
 xmalloc(size_t size);
+xzmalloc(size_t size);
 xrealloc(void *ptr, size_t size);
 ```
