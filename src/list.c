@@ -333,6 +333,11 @@ list_free_full(void *entry)
 	}
 }
 
+/*
+ * @desc		list_destroy -- destroy entry from list
+ * @arg[in]		entry        -- pointer to entry in list
+ * @ret			void
+ */
 inline static void*
 list_destroy(void *entry)
 {
@@ -341,6 +346,11 @@ list_destroy(void *entry)
 	return list_free(entry);
 }
 
+/*
+ * @desc		list_destroy_range -- destroy count entries from <fromth> element from head
+ * @arg[in]		entry              -- pointer to any entry in list
+ * @ret			pointer to head of list or NULL if deleted last entry
+ */
 inline static void*
 list_destroy_range(void *entry, int from, int count)
 {
@@ -359,6 +369,11 @@ list_destroy_range(void *entry, int from, int count)
 	return ret;
 }
 
+/*
+ * @desc		list_destroy_full -- destroy full list
+ * @arg[in]		entry             -- pointer to any entry in list
+ * @ret			void
+ */
 inline static void
 list_destroy_full(void *entry)
 {
@@ -446,6 +461,67 @@ list_reverse(void *list)
 	}
 
 	return list_get_head(list);
+}
+
+inline static void*
+list_merge(void *a, void *b, list_pos pos)
+{
+	size_t size;
+	void *entry;
+
+	if (!a || !b)
+		return list_get_head(!a ? b : a);
+
+	if (pos == LIST_AFTER && !list_get_next(a))
+		pos = LIST_AT_END;
+	else if (pos == LIST_BEFORE) {
+		void *e;
+
+		e = list_get_prev(b);
+		pos = LIST_AT_START;
+
+		if (e) {
+			pos = LIST_AFTER;
+			b = e;
+		}
+	}
+
+	if (__list_get_meta(a)->ent_size != __list_get_meta(b)->ent_size)
+		return NULL;
+
+	size = __list_get_meta(a)->ent_size;
+
+	switch (pos) {
+	case LIST_AT_START:
+		list_rofeach (list_get_tail(b), entry) {
+			a = list_alloc_at_start(a);
+			memcpy(a, entry, size);
+		}
+		break;
+
+	case LIST_AT_END:
+		list_foreach (list_get_head(b), entry) {
+			a = list_alloc_at_end(a);
+			memcpy(a, entry, size);
+		}
+		break;
+
+	case LIST_AFTER:
+		list_foreach (list_get_head(b), entry) {
+			a = list_alloc_after(a);
+			memcpy(a, entry, size);
+		}
+		break;
+
+	// LIST_BEFORE unused
+	case LIST_BEFORE:
+	default:
+		break;
+	}
+
+	list_free_full(b);
+
+	return list_get_head(a);
 }
 
 inline static void

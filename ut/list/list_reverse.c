@@ -29,10 +29,14 @@ valid_cases(void)
 		++i;
 	}
 
+	CU_ASSERT_FATAL(i == 5);
+
 	list_foreach(list_get_head(tsil), entry) {
 		--i;
 		CU_ASSERT_FATAL(entry->num == i);
 	}
+
+	CU_ASSERT_FATAL(i == 0);
 
 	list_free_full(list);
 	list_free_full(tsil);

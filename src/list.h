@@ -59,6 +59,13 @@ struct list_node {
 	__p;								\
 })
 
+typedef enum list_pos {
+	LIST_AFTER,
+	LIST_BEFORE,
+	LIST_AT_START,
+	LIST_AT_END,
+} list_pos;
+
 inline static void* __list_new(size_t size, struct list_meta *meta);
 
 inline static void* list_get_head(void *entry);
@@ -77,6 +84,9 @@ inline static void  list_free_full(void *entry);
 
 inline static void* list_dup(void *list);
 inline static void* list_clone(void *list);
+
+inline static void* list_reverse(void *list);
+inline static void* list_merge(void *a, void *b, list_pos pos);
 
 inline static void* list_destroy(void *entry);
 inline static void* list_destroy_range(void *entry, int from, int count);

@@ -26,6 +26,7 @@ bool list_dup_suite(CU_pSuite suite);
 bool list_clone_suite(CU_pSuite suite);
 
 bool list_reverse_suite(CU_pSuite suite);
+bool list_merge_suite(CU_pSuite suite);
 
 static struct suite suits[] = {
 	{
@@ -59,6 +60,10 @@ static struct suite suits[] = {
 	{
 		.suitename = "list_reverse",
 		.func = list_reverse_suite,
+	},
+	{
+		.suitename = "list_merge",
+		.func = list_merge_suite,
 	},
 };
 

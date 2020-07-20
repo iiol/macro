@@ -75,6 +75,7 @@ list_dup(list);				// duplicate list (without calling user's copy function)
 list_clone(list);			// clone list (with calling user's copy function)
 
 list_reverse(list);			// reverse 'list' list
+list_merge(alist, blist, pos);		// merge blist to alist at 'pos' position
 
 list_free(entry);			// free entry 'entry' from list
 					// and return pointer to new head
