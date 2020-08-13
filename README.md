@@ -50,6 +50,7 @@ str_free(path);
 
 ```c
 list_new(type);			// return pointer to new alloced list
+list_empty(type);		// return pointer to new empty alloced list (for defining local functions)
 
 list_alloc_after(entry);	// return pointer to new alloced entry in list after 'entry'
 list_alloc_before(entry);	// return pointer to new alloced entry in list before 'entry'

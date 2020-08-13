@@ -70,6 +70,26 @@ __list_new(size_t size, struct list_meta *meta)
 }
 
 inline static void*
+__list_empty(size_t size)
+{
+	uint8_t *p;
+	struct list_node *hdr;
+
+	hdr = malloc(size + sizeof (struct list_node));
+	p = (uint8_t*)hdr + sizeof (struct list_node);
+
+	hdr->meta = malloc(sizeof (struct list_meta));
+	hdr->meta->head = hdr;
+	hdr->meta->tail = hdr;
+	hdr->meta->count = 0;
+	hdr->meta->ent_size = size;
+	hdr->prev = NULL;
+	hdr->next = NULL;
+
+	return p;
+}
+
+inline static void*
 list_get_head(void *entry)
 {
 	uint8_t *p;
@@ -167,6 +187,11 @@ __list_alloc_after(void *entry, size_t size)
 	struct list_node *new_hdr, *hdr;
 	struct list_meta *meta;
 
+	if (__list_get_meta(entry)->count == 0) {
+		__list_get_meta(entry)->count = 1;
+		return entry;
+	}
+
 	if (entry == NULL)
 		return __list_new(size, NULL);
 
@@ -196,6 +221,11 @@ __list_alloc_before(void *entry, size_t size)
 	struct list_node *new_hdr, *hdr;
 	struct list_meta *meta;
 
+	if (__list_get_meta(entry)->count == 0) {
+		__list_get_meta(entry)->count = 1;
+		return entry;
+	}
+
 	if (entry == NULL)
 		return __list_new(size, NULL);
 
@@ -224,6 +254,11 @@ __list_alloc_at_end(void *entry, size_t size)
 	if (entry == NULL)
 		return __list_new(size, NULL);
 
+	if (__list_get_meta(entry)->count == 0) {
+		__list_get_meta(entry)->count = 1;
+		return entry;
+	}
+
 	entry = list_get_tail(entry);
 
 	return __list_alloc_after(entry, size);
@@ -235,6 +270,11 @@ __list_alloc_at_start(void *entry, size_t size)
 {
 	if (entry == NULL)
 		return __list_new(size, NULL);
+
+	if (__list_get_meta(entry)->count == 0) {
+		__list_get_meta(entry)->count = 1;
+		return entry;
+	}
 
 	entry = list_get_head(entry);
 

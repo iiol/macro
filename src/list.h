@@ -25,7 +25,8 @@ struct list_node {
 	uint8_t entry[0];
 };
 
-#define list_new(type) __list_new(sizeof (*type), NULL)
+#define list_new(type) __list_new(sizeof (type), NULL)
+#define list_empty(type) __list_empty(sizeof (type))
 
 #define list_alloc_after(entry) __list_alloc_after(entry, sizeof (typeof (*entry)))
 #define list_alloc_before(entry) __list_alloc_before(entry, sizeof (typeof (*entry)))

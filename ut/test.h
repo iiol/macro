@@ -15,6 +15,8 @@ struct suite {
 };
 
 // list test funcs
+bool list_empty_suite(CU_pSuite suite);
+
 bool list_get_head_suite(CU_pSuite suite);
 bool list_get_tail_suite(CU_pSuite suite);
 bool list_get_prev_suite(CU_pSuite suite);
@@ -64,6 +66,10 @@ static struct suite suits[] = {
 	{
 		.suitename = "list_merge",
 		.func = list_merge_suite,
+	},
+	{
+		.suitename = "list_empty",
+		.func = list_empty_suite,
 	},
 };
 
