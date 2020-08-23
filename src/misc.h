@@ -20,16 +20,16 @@ do {									\
 									\
 	UNUSED(_);							\
 									\
-	while ((_ = ((func)(__VA_ARGS__))) < 0 && errno == EINTR)	\
+	while ((rc = ((func)(__VA_ARGS__))) < 0 && errno == EINTR)	\
 		;							\
 									\
-	if (_ < 0) {							\
+	if (rc < 0) {							\
 		char str[] = #func "(" #__VA_ARGS__ ")";		\
 									\
 		if (ecode == 0)						\
-			warning("%s%s", str, strerror(errno));		\
+			warning("%s: %s", str, strerror(errno));	\
 		else							\
-			error(ecode, "%s%s", str, strerror(errno));	\
+			error(ecode, "%s: %s", str, strerror(errno));	\
 	}								\
 } while (0)
 
