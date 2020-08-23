@@ -10,7 +10,7 @@ __str_get_start(string str)
 	for (i = 1; str[-i] != '\0'; ++i)
 		;
 
-	return str - i + 1;
+	return(str - i + 1);
 }
 
 inline static struct str_string*
@@ -18,7 +18,7 @@ __str_get_header(string str)
 {
 	str = __str_get_start(str);
 
-	return (struct str_string*)(str - sizeof (struct str_string) - 1);
+	return((struct str_string*)(str - sizeof (struct str_string) - 1));
 }
 
 inline static string
@@ -39,7 +39,7 @@ str_new(size_t len)
 	head->len = 0;
 	head->bufsize = len;
 
-	return str;
+	return(str);
 }
 
 inline static void
@@ -89,7 +89,7 @@ str_set(string str, const char *s)
 
 	head->len = strlen(str);
 
-	return str;
+	return(str);
 }
 
 inline static string
@@ -120,7 +120,7 @@ str_cat(string str, const char *src)
 	str[head->bufsize] = '\0';
 	head->len = strlen(str);
 
-	return str;
+	return(str);
 }
 
 inline static string
@@ -134,7 +134,7 @@ str_clone(string str)
 	ret = xmalloc(size);
 	memcpy(ret, head, size);
 
-	return (string)ret + sizeof (struct str_string) + 1;
+	return((string)ret + sizeof (struct str_string) + 1);
 }
 
 inline static string
@@ -162,7 +162,7 @@ str_range(string str, size_t start, size_t end)
 	str[len] = '\0';
 	head->len = len;
 
-	return str;
+	return(str);
 }
 
 inline static size_t
@@ -170,7 +170,7 @@ str_len(string str)
 {
 	assert(str);
 
-	return __str_get_header(__str_get_start(str))->len;
+	return(__str_get_header(__str_get_start(str))->len);
 }
 
 inline static string*
@@ -206,7 +206,7 @@ str_split(string str, const char *delim)
 	strs[count - 2] = str_clone(str);
 	strs[count - 2] = str_range(strs[count - 2], start, i);
 
-	return strs;
+	return(strs);
 }
 
 inline static void

@@ -11,7 +11,7 @@ xmalloc(size_t size)
 		exit(EXIT_FAILURE);
 	}
 
-	return ret;
+	return(ret);
 }
 
 inline static void*
@@ -27,7 +27,7 @@ xzmalloc(size_t size)
 
 	memset(ret, 0, size);
 
-	return ret;
+	return(ret);
 }
 
 inline static void*
@@ -41,5 +41,5 @@ xrealloc(void *ptr, size_t size)
 		exit(EXIT_FAILURE);
 	}
 
-	return ret;
+	return(ret);
 }

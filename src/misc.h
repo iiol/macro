@@ -7,6 +7,8 @@
 #define ARR_SZ(a) (sizeof (a)/sizeof (a[0]))
 #define UNUSED(x) (void)x
 #define SWAP(a, b) do {typeof (a) __tmp = a; a = b; b = __tmp;} while (0)
+#define nop(...) do {} while (0)
+#define isarr(p) ((void*)p == (void*)&p ? true : false)
 
 #define sqr(x) ((double)(x)*(x))
 #define MAX(a, b) ((a > b) ? a : b)

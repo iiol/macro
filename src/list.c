@@ -66,7 +66,7 @@ __list_new(size_t size, struct list_meta *meta)
 	hdr->prev = NULL;
 	hdr->next = NULL;
 
-	return p;
+	return(p);
 }
 
 inline static void*
@@ -86,7 +86,7 @@ __list_empty(size_t size)
 	hdr->prev = NULL;
 	hdr->next = NULL;
 
-	return p;
+	return(p);
 }
 
 inline static void*
@@ -97,13 +97,13 @@ list_get_head(void *entry)
 	struct list_meta *meta;
 
 	if (!entry)
-		return NULL;
+		return(NULL);
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
 	meta = hdr->meta;
 
-	return (uint8_t*)meta->head + sizeof (struct list_node);
+	return((uint8_t*)meta->head + sizeof (struct list_node));
 }
 
 inline static void*
@@ -114,13 +114,13 @@ list_get_tail(void *entry)
 	struct list_meta *meta;
 
 	if (!entry)
-		return NULL;
+		return(NULL);
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
 	meta = hdr->meta;
 
-	return (uint8_t*)meta->tail + sizeof (struct list_node);
+	return((uint8_t*)meta->tail + sizeof (struct list_node));
 }
 
 inline static int
@@ -130,12 +130,12 @@ list_get_count(void *entry)
 	struct list_node *hdr;
 
 	if (!entry)
-		return 0;
+		return(0);
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
 
-	return hdr->meta->count;
+	return(hdr->meta->count);
 }
 
 inline static void*
@@ -145,7 +145,7 @@ list_get_prev(void *entry)
 	struct list_node *hdr;
 
 	if (!entry)
-		return NULL;
+		return(NULL);
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -156,7 +156,7 @@ list_get_prev(void *entry)
 	else
 		p = (uint8_t*)hdr + sizeof (struct list_node);
 
-	return p;
+	return(p);
 }
 
 inline static void*
@@ -166,7 +166,7 @@ list_get_next(void *entry)
 	struct list_node *hdr;
 
 	if (!entry)
-		return NULL;
+		return(NULL);
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -177,7 +177,7 @@ list_get_next(void *entry)
 	else
 		p = (uint8_t*)hdr + sizeof (struct list_node);
 
-	return p;
+	return(p);
 }
 
 inline static void*
@@ -189,11 +189,11 @@ __list_alloc_after(void *entry, size_t size)
 
 	if (__list_get_meta(entry)->count == 0) {
 		__list_get_meta(entry)->count = 1;
-		return entry;
+		return(entry);
 	}
 
 	if (entry == NULL)
-		return __list_new(size, NULL);
+		return(__list_new(size, NULL));
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -211,7 +211,7 @@ __list_alloc_after(void *entry, size_t size)
 	new_hdr->prev = hdr;
 	hdr->next = new_hdr;
 
-	return new_p;
+	return(new_p);
 }
 
 inline static void*
@@ -223,11 +223,11 @@ __list_alloc_before(void *entry, size_t size)
 
 	if (__list_get_meta(entry)->count == 0) {
 		__list_get_meta(entry)->count = 1;
-		return entry;
+		return(entry);
 	}
 
 	if (entry == NULL)
-		return __list_new(size, NULL);
+		return(__list_new(size, NULL));
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -245,23 +245,23 @@ __list_alloc_before(void *entry, size_t size)
 	new_hdr->next = hdr;
 	hdr->prev = new_hdr;
 
-	return new_p;
+	return(new_p);
 }
 
 inline static void*
 __list_alloc_at_end(void *entry, size_t size)
 {
 	if (entry == NULL)
-		return __list_new(size, NULL);
+		return(__list_new(size, NULL));
 
 	if (__list_get_meta(entry)->count == 0) {
 		__list_get_meta(entry)->count = 1;
-		return entry;
+		return(entry);
 	}
 
 	entry = list_get_tail(entry);
 
-	return __list_alloc_after(entry, size);
+	return(__list_alloc_after(entry, size));
 
 }
 
@@ -269,16 +269,16 @@ inline static void*
 __list_alloc_at_start(void *entry, size_t size)
 {
 	if (entry == NULL)
-		return __list_new(size, NULL);
+		return(__list_new(size, NULL));
 
 	if (__list_get_meta(entry)->count == 0) {
 		__list_get_meta(entry)->count = 1;
-		return entry;
+		return(entry);
 	}
 
 	entry = list_get_head(entry);
 
-	return __list_alloc_before(entry, size);
+	return(__list_alloc_before(entry, size));
 }
 
 /*
@@ -294,7 +294,7 @@ list_free(void *entry)
 	struct list_meta *meta;
 
 	if (entry == NULL)
-		return NULL;
+		return(NULL);
 
 	p = entry;
 	hdr = (struct list_node*)(p - sizeof (struct list_node));
@@ -321,7 +321,7 @@ list_free(void *entry)
 
 	free(hdr);
 
-	return p;
+	return(p);
 }
 
 /*
@@ -343,7 +343,7 @@ list_free_range(void *entry, int from, int count)
 		ret = list_free(entry);
 	}
 
-	return ret;
+	return(ret);
 }
 
 /*
@@ -383,7 +383,7 @@ list_destroy(void *entry)
 {
 	__list_extern_destroy(entry);
 
-	return list_free(entry);
+	return(list_free(entry));
 }
 
 /*
@@ -406,7 +406,7 @@ list_destroy_range(void *entry, int from, int count)
 		ret = list_free(entry);
 	}
 
-	return ret;
+	return(ret);
 }
 
 /*
@@ -436,7 +436,7 @@ list_dup(void *list)
 	void *entry;
 
 	if (!list)
-		return NULL;
+		return(NULL);
 
 	meta = __list_get_meta(list);
 	size = meta->ent_size;
@@ -447,12 +447,12 @@ list_dup(void *list)
 	}
 
 	if (!nlist)
-		return NULL;
+		return(NULL);
 
 	nmeta = __list_get_meta(nlist);
 	nmeta->ent_size = meta->ent_size;
 
-	return list_get_head(nlist);
+	return(list_get_head(nlist));
 }
 
 inline static void*
@@ -463,7 +463,7 @@ list_clone(void *list)
 	void *entry;
 
 	if (!list)
-		return NULL;
+		return(NULL);
 
 	meta = __list_get_meta(list);
 
@@ -473,12 +473,12 @@ list_clone(void *list)
 	}
 
 	if (!nlist)
-		return NULL;
+		return(NULL);
 
 	nmeta = __list_get_meta(nlist);
 	nmeta->ent_size = meta->ent_size;
 
-	return list_get_head(nlist);
+	return(list_get_head(nlist));
 }
 
 inline static void*
@@ -488,7 +488,7 @@ list_reverse(void *list)
 	struct list_meta *meta;
 
 	if (list == NULL)
-		return NULL;
+		return(NULL);
 
 	meta = __list_get_meta(list);
 	SWAP(meta->head, meta->tail);
@@ -500,7 +500,7 @@ list_reverse(void *list)
 		SWAP(node->next, node->prev);
 	}
 
-	return list_get_head(list);
+	return(list_get_head(list));
 }
 
 inline static void*
@@ -510,7 +510,7 @@ list_merge(void *a, void *b, list_pos pos)
 	void *entry;
 
 	if (!a || !b)
-		return list_get_head(!a ? b : a);
+		return(list_get_head(!a ? b : a));
 
 	if (pos == LIST_AFTER && !list_get_next(a))
 		pos = LIST_AT_END;
@@ -527,7 +527,7 @@ list_merge(void *a, void *b, list_pos pos)
 	}
 
 	if (__list_get_meta(a)->ent_size != __list_get_meta(b)->ent_size)
-		return NULL;
+		return(NULL);
 
 	size = __list_get_meta(a)->ent_size;
 
@@ -561,7 +561,7 @@ list_merge(void *a, void *b, list_pos pos)
 
 	list_free_full(b);
 
-	return list_get_head(a);
+	return(list_get_head(a));
 }
 
 inline static void
